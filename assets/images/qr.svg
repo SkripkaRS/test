@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg baseProfile="full" height="80" version="1.1" width="80" xmlns="http://www.w3.org/2000/svg"
+    xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs />
+    <rect fill="#e2decb" height="72" rx="24" stroke="#e2decb" stroke-width="1" width="72" x="4"
+        y="4" />
+
+    <rect fill="#060501" height="4" rx="2" width="12" x="16" y="16" />
+    <rect fill="#060501" height="12" rx="2" width="4" x="16" y="16" />
+
+    <rect fill="#060501" height="4" rx="2" width="12" x="50" y="16" />
+    <rect fill="#060501" height="12" rx="2" width="4" x="58" y="16" />
+
+    <rect fill="#060501" height="4" rx="2" width="12" x="16" y="58" />
+    <rect fill="#060501" height="12" rx="2" width="4" x="16" y="50" />
+
+    <rect fill="#060501" height="4" rx="2" width="12" x="50" y="58" />
+    <rect fill="#060501" height="12" rx="2" width="4" x="58" y="50" />
+
+    <text fill="#060501" font-family="Arial, sans-serif" font-size="20" font-weight="700"
+        text-anchor="middle" x="39" y="48">QR</text>
+</svg>
