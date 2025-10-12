@@ -1,0 +1,76 @@
+variables:
+  REPOSITORY_URL: 643386052609.dkr.ecr.eu-central-1.amazonaws.com/gitlab/digital-exchange/web
+
+before_script:
+  - $(aws ecr get-login --no-include-email --region eu-central-1)
+
+stages:
+  - build
+  - deploy_staging
+  - deploy_production
+
+prod:digital-exchange:
+  stage: build
+  variables:
+    WHITELABEL: elegro
+    BUILD: elegro
+  when: manual
+  script:
+    - export TAG_NAME=$REPOSITORY_URL:master
+    - docker build --build-arg BuildType=$BUILD -f ./Dockerfile  -t $TAG_NAME .
+    - docker push $TAG_NAME
+  only:
+    - master
+  tags:
+    - shell
+
+stage:digital-exchange:
+  stage: build
+  variables:
+    WHITELABEL: elegro
+    BUILD: elegro-stage
+  when: manual
+  script:
+    - export TAG_NAME=$REPOSITORY_URL:development
+    - docker build --build-arg BuildType=$BUILD -f ./Dockerfile  -t $TAG_NAME .
+    - docker push $TAG_NAME
+  only:
+    - development
+  tags:
+    - shell
+
+deploy:staging:
+  stage: deploy_staging
+  script:
+    - echo "Deploying to staging..."
+    - eval $(ssh-agent -s)
+    - echo "$ID_RSA_STAGE" > digital-exchange.pem
+    - chmod 400 digital-exchange.pem
+    - ssh-add digital-exchange.pem
+    - ssh-keyscan $STAGE_SERVER_NAME >> ~/.ssh/known_hosts
+    - ssh -i digital-exchange.pem $STAGE_SERVER_USER@$STAGE_SERVER_NAME "$(AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws ecr get-login --no-include-email --region eu-central-1)"
+    - ssh -i digital-exchange.pem $STAGE_SERVER_USER@$STAGE_SERVER_NAME "cd /projects/digital-exchange/docker && docker-compose -f docker-compose.stage.digital-exchange.yml pull && docker-compose -f docker-compose.stage.digital-exchange.yml up -d"
+    - ssh -i digital-exchange.pem $STAGE_SERVER_USER@$STAGE_SERVER_NAME "docker system prune -af"
+  only:
+    - development
+  tags:
+    - shell
+  when: manual
+
+deploy:production:
+  stage: deploy_production
+  script:
+    - echo "Deploying to production..."
+    - eval $(ssh-agent -s)
+    - echo "$ID_RSA_PROD" > digital-exchange.pem
+    - chmod 400 digital-exchange.pem
+    - ssh-add digital-exchange.pem
+    - ssh-keyscan $PROD_SERVER_NAME >> ~/.ssh/known_hosts
+    - ssh -i digital-exchange.pem $PROD_SERVER_USER@$PROD_SERVER_NAME "$(AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws ecr get-login --no-include-email --region eu-central-1)"
+    - ssh -i digital-exchange.pem $PROD_SERVER_USER@$PROD_SERVER_NAME "cd /projects/digital-exchange/docker && docker-compose -f docker-compose.prod.digital-exchange.yml pull && docker-compose -f docker-compose.prod.digital-exchange.yml up -d "
+    - ssh -i digital-exchange.pem $PROD_SERVER_USER@$PROD_SERVER_NAME "docker system prune -af"
+  only:
+    - master
+  tags:
+    - shell
+  when: manual
