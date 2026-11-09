@@ -11,16 +11,24 @@
     <link rel="apple-touch-icon" href="assets/images/my-icon.png">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link href="https://db.onlinewebfonts.com/c/a44207bfe4040f536c824dbbf82f5ed1?family=e-Ukraine+Regular" rel="stylesheet">
-  <style>@charset "UTF-8";*,*:before,*:after{margin:0;padding:0;box-sizing:border-box;outline:none;-webkit-tap-highlight-color:transparent}html,body{min-height:100dvh;display:flex;flex-direction:column;margin:0;font-family:e-Ukraine Regular}app-root{min-height:100dvh;flex:1;display:flex;flex-direction:column;justify-content:space-between;padding-top:env(safe-area-inset-top);box-sizing:border-box}</style><link rel="stylesheet" href="styles.c2368fe34d41e107.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles.c2368fe34d41e107.css"></noscript></head>
+  <style>@charset "UTF-8";*,*:before,*:after{margin:0;padding:0;box-sizing:border-box;outline:none;-webkit-tap-highlight-color:transparent}html,body{min-height:var(--app-h, 100dvh);display:flex;flex-direction:column;margin:0;font-family:e-Ukraine Regular}app-root{min-height:var(--app-h, 100dvh);flex:1;display:flex;flex-direction:column;justify-content:space-between;padding-top:env(safe-area-inset-top);box-sizing:border-box}</style><link rel="stylesheet" href="styles.05e48eab8c838cd9.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles.05e48eab8c838cd9.css"></noscript></head>
   <body>
     <script>
       function fixHeight() {
-        document.documentElement.style.setProperty(
-          "--vh",
-          `${window.innerHeight * 0.01}px`
-        );
+        var standalone =
+          window.navigator.standalone === true ||
+          window.matchMedia("(display-mode: standalone)").matches;
+        var portrait = window.matchMedia("(orientation: portrait)").matches;
+        var screenH = portrait
+          ? Math.max(window.screen.width, window.screen.height)
+          : Math.min(window.screen.width, window.screen.height);
+        var h = standalone ? screenH : window.innerHeight;
+        var root = document.documentElement.style;
+        root.setProperty("--vh", h * 0.01 + "px");
+        root.setProperty("--app-h", h + "px");
       }
       window.addEventListener("resize", fixHeight);
+      window.addEventListener("orientationchange", fixHeight);
       fixHeight();
     </script>
     <app-root></app-root>
